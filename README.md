@@ -90,7 +90,7 @@ Dataset
 
 
 ```bash
-python3 ProjectDatasetFlex.py --good_folder /path/to/Dataset1/ --bad_folder /path/to/Dataset2/ --output_dir1 /path/to/projections/directory/ --num_processes 10 --file_list /list/of/files/to/project.txt
+python3 ProjectDatasetFlex.py --good_folder /path/to/Dataset1/ --bad_folder /path/to/Dataset2/ --output_dir1 /path/to/projections/directory/ --num_processes 10
 ```
 
 ### Label Critic: Use LVLM for label comparisons
