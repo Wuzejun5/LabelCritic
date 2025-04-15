@@ -11,7 +11,7 @@ Label Critic is an automated tool for selecting the best AI-generated annotation
 
 The paper was accepted for ISBI 2025. A preprint is available at https://arxiv.org/abs/2411.02753
 
-### Installation and running
+### Installation
 
 <details>
 <summary style="margin-left: 25px;">[Optional] Install Anaconda on Linux</summary>
@@ -40,22 +40,65 @@ pip install -r requirements.txt
 mkdir HFCache
 ```
 
+### Deploy LLM API
+
 Deploy API locally (tp should be the number of GPUs, and it accepts only powers of 2)
 ```bash
 TRANSFORMERS_CACHE=./HFCache HF_HOME=./HFCache CUDA_VISIBLE_DEVICES=0,1,2,3 vllm serve "Qwen/Qwen2-VL-72B-Instruct-AWQ" --dtype=half --tensor-parallel-size 4 --limit-mm-per-prompt image=3 --gpu_memory_utilization 0.9 --port 8000
 ```
 
 
-## Project a dataset:
+### Label Critic: dataset projection
+This code creates 2D projections of a CT dataset and its labels. The command is designed to project two datasets, which represents two set of labels you would like to compare. Both datasets should be in the same format and have matching folder and label names.
+
+
+<details>
+<summary style="margin-left: 25px;">Dataset format: format your datasets with this structure.</summary>
+<div style="margin-left: 25px;">
+
+```
+Dataset
+├── BDMAP_A0000001
+|    ├── ct.nii.gz
+│    └── predictions
+│          ├── liver_tumor.nii.gz
+│          ├── kidney_tumor.nii.gz
+│          ├── pancreas_tumor.nii.gz
+│          ├── aorta.nii.gz
+│          ├── gall_bladder.nii.gz
+│          ├── kidney_left.nii.gz
+│          ├── kidney_right.nii.gz
+│          ├── liver.nii.gz
+│          ├── pancreas.nii.gz
+│          └──...
+├── BDMAP_A0000002
+|    ├── ct.nii.gz
+│    └── predictions
+│          ├── liver_tumor.nii.gz
+│          ├── kidney_tumor.nii.gz
+│          ├── pancreas_tumor.nii.gz
+│          ├── aorta.nii.gz
+│          ├── gall_bladder.nii.gz
+│          ├── kidney_left.nii.gz
+│          ├── kidney_right.nii.gz
+│          ├── liver.nii.gz
+│          ├── pancreas.nii.gz
+│          └──...
+...
+```
+</div>
+</details>
+
+
 ```bash
-python3 ProjectDatasetFlex.py --good_folder /mnt/T9/AbdomenAtlasPro/ --bad_folder /mnt/sdc/pedro/JHH/nnUnetResultsBad/ --output_dir1 /projections/directory/ --num_processes 10 --file_list /mnt/sdc/pedro/ErrorDetection/ErrorLists/low_dice_benchmark_nnUnet_vs_JHH.txt
+python3 ProjectDatasetFlex.py --good_folder /path/to/Dataset1/ --bad_folder /path/to/Dataset2/ --output_dir1 /path/to/projections/directory/ --num_processes 10 --file_list /list/of/files/to/project.txt
 ```
 
-## Run label comparison over projected dataset 
-### (faster than using high level API)
+## Label Critic: Use LVLM for label comparisons
+This command uses the LVLM to compare the labels, using the saved projections. See the end of the comparisons.log file for a detailed log of the result of each comparison.
 
 ```bash
-python3 RunAPI.py --path projections/directory/ > comparisons.log 2>&1
+python3 RunAPI.py --path /path/to/projections/directory/ > comparisons.log 2>&1
 ```
 
 ## Run Error Detection
