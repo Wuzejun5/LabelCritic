@@ -11,6 +11,8 @@ Label Critic is an automated tool for selecting the best AI-generated annotation
 
 The paper was accepted for ISBI 2025. A preprint is available at https://arxiv.org/abs/2411.02753
 
+Bassi, Pedro & Wu, Qilong & Li, Wenxuan & Decherchi, Sergio & Cavalli, Andrea & Yuille, Alan & Zhou, Zongwei. (2024). **Label Critic: Design Data Before Models.** [10.48550/arXiv.2411.02753](https://arxiv.org/abs/2411.02753). 
+
 ### Installation
 
 <details>
@@ -110,8 +112,6 @@ python3 RunErrorDetection.py --path /path/to/projections/directory/ --port 8000 
 ```
 
 # Citation
-
-Bassi, Pedro & Wu, Qilong & Li, Wenxuan & Decherchi, Sergio & Cavalli, Andrea & Yuille, Alan & Zhou, Zongwei. (2024). Label Critic: Design Data Before Models. 10.48550/arXiv.2411.02753. 
 
 ```
 @misc{bassi2024labelcriticdesigndata,
