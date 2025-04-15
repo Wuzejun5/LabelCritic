@@ -48,7 +48,7 @@ TRANSFORMERS_CACHE=./HFCache HF_HOME=./HFCache CUDA_VISIBLE_DEVICES=0,1,2,3 vllm
 
 
 ### Label Critic: dataset projection
-This code creates 2D projections of a CT dataset and its labels. The command is designed to project two datasets, which represents two set of labels you would like to compare. Both datasets should be in the same format and have matching folder and label names. You can compare your dataset labels (/path/to/Dataset1/) to alternative labels produced by a public AI model (/path/to/Dataset2/). For organ segmentation on CT, you can find many state-of-the-art public AI models in the Touchstone Benchmark: https://github.com/mrgiovanni/touchstone
+This code creates 2D projections of a CT dataset and its labels. The command is designed to project two datasets, which represents two set of labels you would like to compare. Both datasets should be in the same format and have matching folder and label names. You can compare your dataset labels (/path/to/Dataset1/) to alternative labels produced by a public AI model (/path/to/Dataset2/). For organ segmentation on CT, you can find many state-of-the-art public AI models in the [Touchstone Benchmark](https://github.com/mrgiovanni/touchstone)
 
 
 <details>
@@ -102,7 +102,7 @@ python3 RunAPI.py --path /path/to/projections/directory/ > comparisons.log 2>&1
 
 ### Label Critic: Error Detection
 
-In case you do not have 3 sets of labels to compare
+In case you do not have two sets of labels to compare, Label Critic can be used to evaluate a single set of labels, and judge if each one is correct or not. 
 
 ```bash
 python3 RunErrorDetection.py --path /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/ --port 8000 --organ [kidneys] --file_structure auto --examples 0 --good_examples_pth /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/kidneys/ --bad_examples_pth /mnt/sdc/pedro/ErrorDetection/errors_nnUnet_full/kidneys/ > organ.log 2>&1
