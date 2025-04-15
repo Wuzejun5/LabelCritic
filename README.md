@@ -26,7 +26,6 @@ source ~/.bashrc
 </div>
 </details>
 
-Install
 ```bash
 git clone https://github.com/PedroRASB/AnnotationVLM
 cd AnnotationVLM
@@ -42,14 +41,14 @@ mkdir HFCache
 
 ### Deploy LLM API
 
-Deploy API locally (tp should be the number of GPUs, and it accepts only powers of 2)
+Deploy API locally (tensor-parallel-size should be the number of GPUs, and it accepts only powers of 2).
 ```bash
 TRANSFORMERS_CACHE=./HFCache HF_HOME=./HFCache CUDA_VISIBLE_DEVICES=0,1,2,3 vllm serve "Qwen/Qwen2-VL-72B-Instruct-AWQ" --dtype=half --tensor-parallel-size 4 --limit-mm-per-prompt image=3 --gpu_memory_utilization 0.9 --port 8000
 ```
 
 
 ### Label Critic: dataset projection
-This code creates 2D projections of a CT dataset and its labels. The command is designed to project two datasets, which represents two set of labels you would like to compare. Both datasets should be in the same format and have matching folder and label names.
+This code creates 2D projections of a CT dataset and its labels. The command is designed to project two datasets, which represents two set of labels you would like to compare. Both datasets should be in the same format and have matching folder and label names. You can compare your dataset labels (/path/to/Dataset1/) to alternative labels produced by a public AI model (/path/to/Dataset2/). For organ segmentation on CT, you can find many state-of-the-art public AI models in the Touchstone Benchmark: https://github.com/mrgiovanni/touchstone
 
 
 <details>
@@ -94,14 +93,16 @@ Dataset
 python3 ProjectDatasetFlex.py --good_folder /path/to/Dataset1/ --bad_folder /path/to/Dataset2/ --output_dir1 /path/to/projections/directory/ --num_processes 10 --file_list /list/of/files/to/project.txt
 ```
 
-## Label Critic: Use LVLM for label comparisons
-This command uses the LVLM to compare the labels, using the saved projections. See the end of the comparisons.log file for a detailed log of the result of each comparison.
+### Label Critic: Use LVLM for label comparisons
+This command uses the LVLM to compare the two sets of labels, using the projections saved in the command above. See the end of the comparisons.log file for a detailed log of the result of each comparison.
 
 ```bash
 python3 RunAPI.py --path /path/to/projections/directory/ > comparisons.log 2>&1
 ```
 
-## Run Error Detection
+### Label Critic: Error Detection
+
+In case you do not have 3 sets of labels to compare
 
 ```bash
 python3 RunErrorDetection.py --path /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/ --port 8000 --organ [kidneys] --file_structure auto --examples 0 --good_examples_pth /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/kidneys/ --bad_examples_pth /mnt/sdc/pedro/ErrorDetection/errors_nnUnet_full/kidneys/ > organ.log 2>&1
