@@ -105,7 +105,7 @@ python3 RunAPI.py --path /path/to/projections/directory/ > comparisons.log 2>&1
 In case you do not have two sets of labels to compare, Label Critic can be used to evaluate a single set of labels, and judge if each one is correct or not. The --examples arguments controls the number of examples of good and bad labels given to the LVLM (in-context learning). After tunning the command, check the log file for a detailed output.
 
 ```bash
-python3 RunErrorDetection.py --path /path/to/dataset/ --port 8000 --organ [kidneys] --file_structure auto --examples 0 --good_examples_pth /path/to/good/label/examples/ --bad_examples_pth /path/to/bad/label/examples/ > organ.log 2>&1
+python3 RunErrorDetection.py --path /path/to/dataset/projections/ --port 8000 --organ [kidneys] --file_structure auto --examples 0 --good_examples_pth /path/to/good/label/examples/ --bad_examples_pth /path/to/bad/label/examples/ > organ.log 2>&1
 ```
 
 # Citation
