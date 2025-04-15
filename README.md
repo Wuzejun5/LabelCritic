@@ -11,9 +11,14 @@ Label Critic is an automated tool for selecting the best AI-generated annotation
 
 ### Paper
 
-The paper was accepted for ISBI 2025. A preprint is available.
+<b>Label Critic: Design Data Before Models</b> <br/>
+Pedro R. A. S. Bassi, Qilong Wu, Wenxuan Li, Sergio Decherchi, Andrea Cavalli, Alan Yuille, Zongwei Zhou <br/>
+International Symposium on Biomedical Imaging (ISBI, 2025) <br/>
+[Read More](https://arxiv.org/abs/2411.02753) <br/>
 
-Bassi, Pedro & Wu, Qilong & Li, Wenxuan & Decherchi, Sergio & Cavalli, Andrea & Yuille, Alan & Zhou, Zongwei. (2024). **Label Critic: Design Data Before Models.** [https://arxiv.org/abs/2411.02753](https://arxiv.org/abs/2411.02753). 
+<br/>
+
+[📄 View the ISBI Poster](https://github.com/PedroRASB/LabelCritic/raw/main/misc/ISBI_Label_critic_poster.pdf)
 
 ### Installation
 
