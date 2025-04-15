@@ -128,6 +128,6 @@ python3 RunErrorDetection.py --path /path/to/projections/directory/ --port 8000 
 ```
 
 <p align="center">
-  <img src="https://github.com/PedroRASB/Cerberus/blob/main/misc/LabelCritic.png" alt="Project Logo" width="150"/>
+  <img src="https://github.com/PedroRASB/Cerberus/blob/main/misc/LabelCriticLogos.png" alt="Project Logo" width="900"/>
 </p>
 
