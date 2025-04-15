@@ -1,14 +1,6 @@
-<table style="border: none; border-collapse: collapse;">
-  <tr style="border: none;">
-    <td style="border: none; padding-right: 15px;">
-      <img src="https://github.com/PedroRASB/Cerberus/blob/main/misc/LabelCritic.png" alt="Project Logo" width="120"/>
-    </td>
-    <td style="border: none;">
-      <h1 style="margin-bottom:0;">Label Critic</h1>
-      <h3 style="margin-top:0;">Using LVLMs to Compare Medical Segmentations and Correct Label Errors</h3>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="https://github.com/PedroRASB/Cerberus/blob/main/misc/LabelCriticTitle.png" alt="Project Logo" width="900"/>
+</p>
 
 <p align="center">
   <img src="https://github.com/PedroRASB/Cerberus/blob/main/misc/LabelCriticModel.png" alt="Project Logo" width="900"/>
