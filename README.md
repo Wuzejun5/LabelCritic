@@ -108,12 +108,6 @@ In case you do not have two sets of labels to compare, Label Critic can be used 
 python3 RunErrorDetection.py --path /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/ --port 8000 --organ [kidneys] --file_structure auto --examples 0 --good_examples_pth /mnt/sdc/pedro/ErrorDetection/good_labels_beta_full/kidneys/ --bad_examples_pth /mnt/sdc/pedro/ErrorDetection/errors_nnUnet_full/kidneys/ > organ.log 2>&1
 ```
 
-Or, for running over all datasets:
-
-```bash
-bash /mnt/sdg/pedro/AnnotationVLM/RunED.sh --organ postcava --port 8000 --annotation_vlm_root /mnt/sdg/pedro/AnnotationVLM/ --error_detection_root /mnt/sdg/pedro/
-```
-
 # Citation
 
 Bassi, Pedro & Wu, Qilong & Li, Wenxuan & Decherchi, Sergio & Cavalli, Andrea & Yuille, Alan & Zhou, Zongwei. (2024). Label Critic: Design Data Before Models. 10.48550/arXiv.2411.02753. 
