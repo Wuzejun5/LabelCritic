@@ -20,6 +20,8 @@ International Symposium on Biomedical Imaging (ISBI, 2025) <br/>
 
 [📄 View the ISBI Poster](https://github.com/PedroRASB/LabelCritic/raw/main/misc/ISBI_Label_critic_poster.pdf)
 
+[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://youtu.be/9D5-pFgtgDQ)
+
 ## Code
 
 ### Installation
