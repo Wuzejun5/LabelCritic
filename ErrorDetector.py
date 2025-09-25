@@ -13,7 +13,7 @@ import gc
 try:
     from . import Projection as prj
 except:
-    import Projection as prj
+    import projection as prj
 import tempfile
 import shutil
 import copy
@@ -4070,7 +4070,12 @@ def Prompt2MessagesSepFiguresLMDeployDualConfirmation(clean, y1, y2,
                             text_summarize=CompareSummarize, organ='liver',
                             save_memory=False, window='bone',solid_overlay=False,
                             conservative=False):
-    
+
+    print("=== Start Prompt2MessagesSepFiguresLMDeployDualConfirmation ===")
+    print("Organ:", organ, "| Window:", window)
+    print("Clean image:", clean)
+    print("Overlay images: y1 =", y1, ", y2 =", y2)
+
     organRegion=text_region % {'organ': organ.replace('_',' ').replace('gall bladder','gallbladder')}
 
     if organ=='aorta':
@@ -4084,41 +4089,49 @@ def Prompt2MessagesSepFiguresLMDeployDualConfirmation(clean, y1, y2,
     if organ=='gall_bladder':
         organRegion+=GallbladderDescriptionLocation
 
+    print("\n[Step 1] Sending initial organRegion prompt...")
+    print("Prompt text:", organRegion[:200], "..." if len(organRegion)>200 else "")
     conversation, answer = SendMessageLmdeploy([clean], conver=[], text=organRegion,
-                                                base_url=base_url, size=size)
+                                               base_url=base_url, size=size)
+    print("[Step 1] Raw answer:", answer)
+
     q='q2'
     if 'skeleton' in window:
         q='q4'
     AnswerNo=('no' in answer.lower()[answer.lower().rfind(q):answer.lower().rfind(q)+7])
+    print("AnswerNo detected:", AnswerNo, organ)
+
     if organ=='aorta':
         if 'skeleton' in window:
             if ('no' in answer.lower()[answer.lower().rfind('q6'):answer.lower().rfind('q6')+7]):#no lungs
                 organ='descending aorta'
-                #check for red on top of the images
+                print("Aorta special case → descending aorta")
                 if red_on_top(y1) and not red_on_top(y2):
-                    print('There should be red on top of the images, only image 1 has it')
+                    print('Red detected only on y1 → returning 1')
                     return 1, [1,2]
                 elif red_on_top(y2) and not red_on_top(y1):
-                    print('There should be red on top of the images, only image 2 has it')
+                    print('Red detected only on y2 → returning 2')
                     return 2, [2,1]
         else:
             if ('yes' in answer.lower()[answer.lower().rfind('q5'):answer.lower().rfind('q5')+7]):#aortic arch present
                 organ='aorta'
                 text_compare=Compare2ImagesFullAorta
+                print("Aorta special case → aortic arch present, using full aorta compare text")
             else:
                 organ='descending aorta'
-                #check for red on top of the images
+                print("Aorta special case → descending aorta")
                 if red_on_top(y1) and not red_on_top(y2):
-                    print('There should be red on top of the images, only image 1 has it')
+                    print('Red detected only on y1 → returning 1')
                     return 1, [1,2]
                 elif red_on_top(y2) and not red_on_top(y1):
-                    print('There should be red on top of the images, only image 2 has it')
+                    print('Red detected only on y2 → returning 2')
                     return 2, [2,1]
-    
+
     if AnswerNo:
         a1=RedArea(y1)
         a2=RedArea(y2)
-        print('Annotation should be zero')
+        print("\n[Step 2] Annotation should be zero check")
+        print("RedArea(y1) =", a1, "| RedArea(y2) =", a2)
         if a1==0 and a2==0:
             return 0.5, [1,1]
         elif a1==0:
@@ -4127,24 +4140,11 @@ def Prompt2MessagesSepFiguresLMDeployDualConfirmation(clean, y1, y2,
             return 2, [2,1]
         else:
             return 0.5, [-1,-1]
-    #else:
-    #    a1=RedArea(y1)
-    #    a2=RedArea(y2)
-    #    if a1==0 and a2==0:
-    #        print('Both annotations are empty, but they should not be')
-    #        return 0.5, [1,1]
-    #    elif a1==0:
-    #        print('y1 is empty, but it should not be')
-    #        return 2.0, [2,1]
-    #    elif a2==0:
-    #        print('y2 is empty, but it should not be')
-    #        return 1.0, [1,2]
-    
-    
+
     if isinstance(text_compare, dict):
         text_compare=text_compare[organ]
     text_compare=text_compare % {'organ': organ.replace('_',' ').replace('gall bladder','gallbladder')}
-    
+
     if save_memory:
         conversation=[[],[]]
     else:
@@ -4152,17 +4152,31 @@ def Prompt2MessagesSepFiguresLMDeployDualConfirmation(clean, y1, y2,
     imgs=[[y1,y2],[y2,y1]]
     text=[text_compare,text_compare]
 
+    print("\n[Step 2] Sending comparison prompt...")
+    print("Imgs[0]:", imgs[0])
+    print("Imgs[1]:", imgs[1])
+    print("Prompt[0] preview:\n", text[0][:300], "..." if len(text[0])>300 else "")
     conversation, answer = SendMessageLmdeploy(imgs,text=text, conver=conversation,
-                                                base_url=base_url, size=size, solid_overlay=solid_overlay,
-                                                batch=2)
+                                               base_url=base_url, size=size, solid_overlay=solid_overlay,
+                                               batch=2)
+    print("[Step 2] Raw answer batch:", answer)
+
     imgs=[[],[]]
     text=[text_summarize+answer[0],text_summarize+answer[1]]
     conver=[[],[]]
+
+    print("\n[Step 3] Sending summarization prompt...")
+    print("Summarize prompt[0]:", text[0][:200], "..." if len(text[0])>200 else "")
     conversation, answer = SendMessageLmdeploy(imgs, text=text, conver=conver,
                                                base_url=base_url, size=size,
                                                batch=2)
+    print("[Step 3] Raw summarization answer:", answer)
 
-    return CompareAnswers(answer,conservative)
+    final_answer = CompareAnswers(answer,conservative)
+    print("=== Final parsed answer:", final_answer, "===")
+    return final_answer
+
+
     
 def Prompt2MessagesSepFiguresLMDeployDualConfirmationInContext(clean, y1, y2, 
                             good_examples, bad_examples,
@@ -4285,117 +4299,6 @@ def Prompt2MessagesSepFiguresLMDeployDualConfirmationInContext(clean, y1, y2,
                                                batch=2)
 
     return CompareAnswers(answer,conservative,in_context=True)
-
-def Prompt4MessagesSepFiguresLMDeploySuperposition(clean, y1, y2, y_super,
-                            base_url='http://0.0.0.0:8000/v1', size=512,
-                            text_region=BodyRegionText, 
-                            organ_descriptions=DescriptionsED,
-                            text_y1=ZeroShotInstructions, 
-                            text_y2=ZeroShotInstructions,
-                            text_compare=TextCompareSuper,
-                            text_summarize=CompareSummarize, organ='liver',
-                            save_memory=False, window='bone'):
-    
-    organRegion=text_region % {'organ': organ.replace('_',' ')}
-    text_compare=text_compare % {'organ': organ.replace('_',' ')}
-    if organ=='aorta':
-        if window=='skeleton':
-            organRegion+=AorticArchTextSkeleton
-        else:
-            organRegion+=AorticArchText
-
-    conversation, answer = SendMessageLmdeploy([clean], conver=[], text=organRegion,
-                                                base_url=base_url, size=size)
-    q='q2'
-    if 'skeleton' in window:
-        q='q4'
-    AnswerNo=('no' in answer.lower()[answer.lower().rfind(q):answer.lower().rfind(q)+7])
-    if organ=='aorta':
-        if 'skeleton' in window:
-            if ('no' in answer.lower()[answer.lower().rfind('q6'):answer.lower().rfind('q6')+7]):#no lungs
-                organ='descending aorta'
-                #check for red on top of the images
-                if red_on_top(y1) and not red_on_top(y2):
-                    print('There should be red on top of the images, only image 1 has it')
-                    return 1
-                elif red_on_top(y2) and not red_on_top(y1):
-                    print('There should be red on top of the images, only image 2 has it')
-                    return 2
-        else:
-            if ('yes' in answer.lower()[answer.lower().rfind('q5'):answer.lower().rfind('q5')+7]):#aortic arch present
-                organ='aorta'
-            else:
-                organ='descending aorta'
-                #check for red on top of the images
-                if red_on_top(y1) and not red_on_top(y2):
-                    print('There should be red on top of the images, only image 1 has it')
-                    return 1
-                elif red_on_top(y2) and not red_on_top(y1):
-                    print('There should be red on top of the images, only image 2 has it')
-                    return 2
-    
-    if AnswerNo:
-        a1=RedArea(y1)
-        a2=RedArea(y2)
-        print('Annotation should be zero')
-        if a1==0 and a2==0:
-            return 0.5
-        elif a1==0:
-            return 1
-        elif a2==0:
-            return 2
-        else:
-            return -1
-    #else:
-    #    a1=RedArea(y1)
-    #    a2=RedArea(y2)
-    #    if a1==0 and a2==0:
-    #        print('Both annotations are empty, but they should not be')
-    #        return 0.5
-    #    elif a1==0:
-    #        print('y1 is empty, but it should not be')
-    #        return 2.0
-    #    elif a2==0:
-    #        print('y2 is empty, but it should not be')
-    #        return 1.0
-    
-    
-    text_y1 = text_y1 % {'organ': organ.replace('_',' '), 'number': 1} 
-    text_y1 += organ_descriptions[organ]
-
-    text_y2 = text_y2 % {'organ': organ.replace('_',' '), 'number': 2} 
-    text_y2 += organ_descriptions[organ]
-
-    if save_memory:
-        conversation=[]
-
-    #Analyze image 1
-    imgs=[y1]
-    conversation, answer = SendMessageLmdeploy(imgs,text=text_y1, conver=conversation,
-                                                base_url=base_url, size=size)
-    
-    #Analyze image 2
-    imgs=[y2]
-    conversation, answer = SendMessageLmdeploy(imgs,text=text_y2, conver=conversation,
-                                                base_url=base_url, size=size)
-
-    #compare
-    imgs=[y_super]
-    conversation, answer = SendMessageLmdeploy(imgs,text=text_compare, conver=conversation,
-                                                base_url=base_url, size=size)
-    
-    if 'image' not in answer.lower() and 'overlay' not in answer.lower():
-        return 0.5
-    
-    conversation, answer = SendMessageLmdeploy([], text=text_summarize+answer, conver=[],
-                                               base_url=base_url, size=size)
-
-    if 'overlay 1' in answer.lower() and 'overlay 2' not in answer.lower():
-        return 1
-    elif 'overlay 2' in answer.lower() and 'overlay 1' not in answer.lower():
-        return 2
-    else:
-        return 0.5
 
 def Prompt4MessagesSepFiguresLMDeploy(clean, y1, y2, 
                             base_url='http://0.0.0.0:8000/v1', size=512,
@@ -5244,7 +5147,7 @@ def SystematicComparisonLMDeploySepFigures(pth,base_url='http://0.0.0.0:8000/v1'
 
             print('dual_confirmation:',dual_confirmation)
             print('multi_image_prompt_2:',multi_image_prompt_2)
-
+            print('examples:',examples)
             if examples>0:
                 good_examples=random.sample(cases_high_dice,examples)
                 #use y2 over all good examples
@@ -5404,8 +5307,6 @@ def SystematicComparisonLMDeploySepFigures(pth,base_url='http://0.0.0.0:8000/v1'
 
         for k,v in outputs.items():
             print(k,v)
-
-
 organ_list=['adrenal_gland_left',
  'adrenal_gland_right',
  'aorta',

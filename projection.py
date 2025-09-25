@@ -579,7 +579,7 @@ def process_single_file(pid, ct_pth, mask_pth, destin, organ, axis, device, skip
                      and os.path.exists(os.path.join(destin,pid,pid+'_ct_window_bone_axis_'+str(axis)+'.png')):
         print(f'Skipping {pid}, already exists')
         return
-
+    print(ct_pth, mask_pth)
     if not os.path.isdir(os.path.join(ct_pth, pid)):
         print(f'Patient {pid} not found')
         return
