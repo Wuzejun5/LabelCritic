@@ -121,6 +121,12 @@ This command uses the LVLM to compare the two sets of labels, using the projecti
 python3 RunAPI.py --path /path/to/projections/directory/ > comparisons.log 2>&1
 ```
 
+or, to compare two individual labels instead of full label sets:
+```bash
+python3 compare_organ.py
+```
+Edit the input paths directly inside compare_organ.py before running.
+
 ### Label Critic: Error Detection
 
 In case you do not have two sets of labels to compare, Label Critic can be used to evaluate a single set of labels, and judge if each one is correct or not. The --examples argument controls the number of examples of good and bad labels given to the LVLM (in-context learning). To use examples, you may check the labels and select a few good and bad examples, and place them in the folders /path/to/good/label/examples/ and /path/to/bad/label/examples/. After running the command, check the log file for a detailed output.
